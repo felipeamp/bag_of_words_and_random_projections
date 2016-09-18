@@ -90,30 +90,32 @@ def create_projection(projection_matrix, original_samples_matrix):
     return np.dot(projection_matrix, original_samples_matrix)
 
 if __name__ == '__main__':
-    # TODO: definir o nome dos arquivos a serem abertos e chamar as funções na ordem necessária.
-    # Depois apagar o "pass"
-    N = 1000
+    N = 1000    # Number of samples
+    d = 100000  # Original samples dimension
 
     # TODO(williamducfer): Ler o arquivo de entrada e selecionar e gerar a bag of words.
     # Gerando matriz aleatória para testar as funções
-    X = np.random.rand(100000, N)
+    X = np.random.rand(d, N)
 
-    #Passo 4.
-    proj_dims = [4**x for x in range(1,9)]
+    # Passo 4.
     gen_ach_time = 0
     gen_gauss_time = 0
     proj_ach_time = 0
     proj_gauss_time = 0
-    for d in proj_dims:
+    proj_dist_ach_time = 0
+    proj_dist_gauss_time = 0
+
+    proj_dims = [4**x for x in range(1,9)]
+    for n in proj_dims:
         print ("-----------------------------------")
-        print (d, " dimensions")
+        print ("Projecting in ", n, " dimensions")
         # 4.a.
         time_initial = timeit.default_timer()
-        ach_mat = gen_achiloptas_matrix(d, X.shape[0])
+        ach_mat = gen_achiloptas_matrix(n, X.shape[0])
         gen_ach_time = timeit.default_timer() - time_initial
 
         time_initial = timeit.default_timer()
-        gauss_mat = gen_gaussian_matrix(d, X.shape[0])
+        gauss_mat = gen_gaussian_matrix(n, X.shape[0])
         gen_gauss_time = timeit.default_timer() - time_initial
 
         # 4.b.
@@ -128,10 +130,14 @@ if __name__ == '__main__':
         # 4.c.
         time_initial = timeit.default_timer()
         projected_distances_ach = sp.distance.pdist(PX_ach, metric = 'sqeuclidean')
+        proj_dist_ach_time = timeit.default_timer() - time_initial
+
+        time_initial = timeit.default_timer()
         projected_distances_gauss = sp.distance.pdist(PX_gauss, metric = 'sqeuclidean')
-        proj_dist_time = timeit.default_timer() - time_initial
+        proj_dist_gauss_time = timeit.default_timer() - time_initial
 
         print("Time to generate the projection matrices", gen_ach_time + gen_gauss_time)
         print("Projection times:\n\tAchlioptas method: ", proj_ach_time, "\n\tGaussian method:", proj_gauss_time)
-        print("Time to calculate the pairwise distances: ", proj_dist_time)
+        print("Time to calculate the pairwise distances (Achlioptas): ", proj_dist_ach_time)
+        print("Time to calculate the pairwise distances (Gauss): ", proj_dist_gauss_time)
 
