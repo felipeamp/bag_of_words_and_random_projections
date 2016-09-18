@@ -7,6 +7,7 @@ import os
 import timeit
 
 import numpy as np
+from scipy import spatial as sp
 
 # TODO:
 # 1. Baixar o Dataset Bag of Words, arquivo NYTimes, do UCI
@@ -124,13 +125,13 @@ if __name__ == '__main__':
         PX_gauss = create_projection(gauss_mat, X)
         proj_gauss_time = timeit.default_timer() - time_initial
 
-        print(gen_ach_time, gen_gauss_time, proj_ach_time, proj_gauss_time)
-
         # 4.c.
-        #[rows, cols] = PX_ach.shape
-        #projected_distances = np.zeros((N, N))
-        #for i in range(rows):
-        #    for j in range(cols):
-        #        projected_distances
-                
+        time_initial = timeit.default_timer()
+        projected_distances_ach = sp.distance.pdist(PX_ach, metric = 'sqeuclidean')
+        projected_distances_gauss = sp.distance.pdist(PX_gauss, metric = 'sqeuclidean')
+        proj_dist_time = timeit.default_timer() - time_initial
+
+        print("Time to generate the projection matrices", gen_ach_time + gen_gauss_time)
+        print("Projection times:\n\tAchlioptas method: ", proj_ach_time, "\n\tGaussian method:", proj_gauss_time)
+        print("Time to calculate the pairwise distances: ", proj_dist_time)
 
