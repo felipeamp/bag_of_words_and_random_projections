@@ -3,8 +3,8 @@
 
 
 import math
-# import os
-# import timeit
+import os
+import timeit
 
 import numpy as np
 
@@ -62,9 +62,75 @@ def calculate_max_distortion_probability(number_of_samples, original_sample_dime
         (projected_sample_dimension * max_distortion**2)/6.0)
 
 
+def gen_achiloptas_matrix(projected_sample_dimension, original_sample_dimension):
+    assert(projected_sample_dimension > 0)
+    assert(original_sample_dimension > 0)
+    assert(projected_sample_dimension < original_sample_dimension)
 
+    options = (-1., 0., 1.)
+    prob_weights = (1./6., 2./3., 1./6.)
+    ach_mat = np.random.choice(options,
+                               size = (projected_sample_dimension, original_sample_dimension),
+                               p = prob_weights)
+    return ach_mat
+
+def gen_gaussian_matrix(projected_sample_dimension, original_sample_dimension):
+    assert(projected_sample_dimension > 0)
+    assert(original_sample_dimension > 0)
+    assert(projected_sample_dimension < original_sample_dimension)
+
+    gauss_mat = np.random.normal(loc = 0.0,
+                                 scale = 1.0 / math.sqrt(projected_sample_dimension),
+                                 size = (projected_sample_dimension, original_sample_dimension))
+    
+    return gauss_mat
+
+def create_projection(projection_matrix, original_samples_matrix):
+    return np.dot(projection_matrix, original_samples_matrix)
 
 if __name__ == '__main__':
     # TODO: definir o nome dos arquivos a serem abertos e chamar as funções na ordem necessária.
     # Depois apagar o "pass"
-    pass
+    N = 1000
+
+    # TODO(williamducfer): Ler o arquivo de entrada e selecionar e gerar a bag of words.
+    # Gerando matriz aleatória para testar as funções
+    X = np.random.rand(100000, N)
+
+    #Passo 4.
+    proj_dims = [4**x for x in range(1,9)]
+    gen_ach_time = 0
+    gen_gauss_time = 0
+    proj_ach_time = 0
+    proj_gauss_time = 0
+    for d in proj_dims:
+        print ("-----------------------------------")
+        print (d, " dimensions")
+        # 4.a.
+        time_initial = timeit.default_timer()
+        ach_mat = gen_achiloptas_matrix(d, X.shape[0])
+        gen_ach_time = timeit.default_timer() - time_initial
+
+        time_initial = timeit.default_timer()
+        gauss_mat = gen_gaussian_matrix(d, X.shape[0])
+        gen_gauss_time = timeit.default_timer() - time_initial
+
+        # 4.b.
+        time_initial = timeit.default_timer()
+        PX_ach = create_projection(ach_mat, X)
+        proj_ach_time = timeit.default_timer() - time_initial
+
+        time_initial = timeit.default_timer()
+        PX_gauss = create_projection(gauss_mat, X)
+        proj_gauss_time = timeit.default_timer() - time_initial
+
+        print(gen_ach_time, gen_gauss_time, proj_ach_time, proj_gauss_time)
+
+        # 4.c.
+        #[rows, cols] = PX_ach.shape
+        #projected_distances = np.zeros((N, N))
+        #for i in range(rows):
+        #    for j in range(cols):
+        #        projected_distances
+                
+
