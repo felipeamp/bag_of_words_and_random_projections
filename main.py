@@ -149,10 +149,12 @@ def main():
 
         # 4.c.
         time_initial = timeit.default_timer()
+        # sp.distance.pdist wants the vectors in the matrix' rows, thus we transpose.
         projected_distances_ach = sp.distance.pdist(proj_ach.T, metric='sqeuclidean')
         proj_dist_ach_time = timeit.default_timer() - time_initial
 
         time_initial = timeit.default_timer()
+        # sp.distance.pdist wants the vectors in the matrix' rows, thus we transpose.
         projected_distances_gauss = sp.distance.pdist(proj_gauss.T, metric='sqeuclidean')
         proj_dist_gauss_time = timeit.default_timer() - time_initial
 
