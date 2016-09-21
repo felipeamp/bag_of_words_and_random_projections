@@ -117,7 +117,7 @@ def calculate_max_distortion_prob(number_of_samples, projected_sample_dimension,
 def main():
     N = 1000    # Number of samples
     d = 102660  # original_sample_dimension
-    filepath_docs_bag_of_words = os.path.join("dataset", "docword.nytimes.txt")
+    filepath_docs_bag_of_words = os.path.join("dataset", "docword.nytimes.txt_preprocessed.txt")
     orig_dist_time = 0.0
     gen_ach_time = 0.0
     gen_gauss_time = 0.0
