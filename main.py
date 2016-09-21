@@ -110,8 +110,8 @@ def calculate_max_distortion(list_of_original_vectors, list_of_projected_vectors
 
 
 def calculate_max_distortion_prob(number_of_samples, projected_sample_dimension, max_distortion):
-    return float(number_of_samples**2) / math.exp(
-        (projected_sample_dimension * max_distortion**2)/6.0)
+    return float(number_of_samples**2) * math.exp(
+        - (projected_sample_dimension * max_distortion**2)/6.0)
 
 
 def main():
@@ -145,7 +145,7 @@ def main():
     print("Time to calculate the original pairwise distances: ", orig_dist_time)
 
     # Passo 4.
-    proj_dims = [4**x for x in range(1, 9)]
+    proj_dims = [4**x for x in range(1, 9)]#[4**7]
     for n in proj_dims:
         print("-----------------------------------")
         print("Projecting in", n, "dimensions")
