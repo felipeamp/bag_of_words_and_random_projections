@@ -120,18 +120,11 @@ def get_files_bag_of_words(filename, num_files, num_words_in_vocabulary):
 def main():
     N = 1000    # Number of samples
     d = 102660  # Original samples dimension
-    filename_files_bag_of_words = "dataset/docword.nytimes.txt" 
+    filename_files_bag_of_words = "dataset/docword.nytimes.txt_preprocessed.txt" 
 
     # Passo 2.
     files_bag_of_words = get_files_bag_of_words(filename=filename_files_bag_of_words, 
                                                 num_files=N, num_words_in_vocabulary=d)
-    
-    for (i, doc) in enumerate(files_bag_of_words.T):
-        for j in range(d):
-            if doc[j] != 0:
-                print("%i %i %i" % (i + 1, j + 1, doc[j]))
-
-    exit()
 
     # Passo 3.
     time_initial = timeit.default_timer()
