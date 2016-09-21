@@ -98,17 +98,40 @@ def calculate_max_distortion_prob(number_of_samples, projected_sample_dimension,
         (projected_sample_dimension * max_distortion**2)/6.0)
 
 
+def get_files_bag_of_words(filename, num_files, num_words_in_vocabulary):
+    files_bag_of_words = np.zeros(shape=(num_words_in_vocabulary, num_files), dtype=int)
+    
+    with open(filename, "r") as file:
+        for line in file:
+            docID, wordID, count = line.split()
+            
+            try:
+                docID = int(docID)
+                wordID = int(wordID)
+                count = int(count)
+            except e:
+                print("Error: values of docID, wordID or count couldn't be converted to integer.")
+            
+            files_bag_of_words[wordID - 1, docID - 1] = count
+    
+    return files_bag_of_words
+
+
 def main():
     N = 1000    # Number of samples
-    d = 100000  # Original samples dimension
+    d = 102660  # Original samples dimension
+    filename_files_bag_of_words = "dataset/docword.nytimes.txt" 
 
-    # TODO(williamducfer): Ler o arquivo de entrada e selecionar e gerar a bag of words.
-    # Crie um numpy array files_bag_of_words contendo uma coluna para a bag of words de cada
-    # arquivo. Portanto este array deve ter dimensões d x N.
+    # Passo 2.
+    files_bag_of_words = get_files_bag_of_words(filename=filename_files_bag_of_words, 
+                                                num_files=N, num_words_in_vocabulary=d)
+    
+    for (i, doc) in enumerate(files_bag_of_words.T):
+        for j in range(d):
+            if doc[j] != 0:
+                print("%i %i %i" % (i + 1, j + 1, doc[j]))
 
-    # Gerando matriz aleatória para testar as funções. Depois que implementar o código acima,
-    # deletar.
-    files_bag_of_words = np.random.rand(d, N)
+    exit()
 
     # Passo 3.
     time_initial = timeit.default_timer()
