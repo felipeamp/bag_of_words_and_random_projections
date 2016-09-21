@@ -203,7 +203,8 @@ def main():
         #  4.e
         prob_ach_distortion = calculate_max_distortion_prob(N, n, ach_max_distortion)
         prob_gauss_distortion = calculate_max_distortion_prob(N, n, gauss_max_distortion)
-        print("Probability of such greatest distortions: (delta, according to J-L lemma)")
+        print("Probability of such greatest distortions (or larger):"
+              " (delta, according to J-L lemma)")
         print("\tAchlioptas method:", prob_ach_distortion)
         print("\tGaussian method:", prob_gauss_distortion)
 
