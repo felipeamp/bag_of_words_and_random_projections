@@ -1,18 +1,18 @@
-Time to calculate the original pairwise distances:  28.40171098999963
+Time to calculate the original pairwise distances:  28.42253124400031
 -----------------------------------
-Projecting in 16384 dimensions
+Projecting in 4096 dimensions
 Time to generate the projection matrices:
-	Achlioptas method: 122.78690651299985
-	Gaussian method: 97.51521229900027
+	Achlioptas method: 8.505975056999887
+	Gaussian method: 17.594068366999636
 Projection times:
-	Achlioptas method: 114.36118973200064
-	Gaussian method: 41.31454903700069
+	Achlioptas method: 5.113090467999882
+	Gaussian method: 6.747951624999587
 Time to calculate the pairwise distances:
-	Achlioptas method: 6.828109087000485
-	Gaussian method: 4.297621347999666
+	Achlioptas method: 1.324996165000357
+	Gaussian method: 1.4882720310001787
 Greatest distortions:
-	Achlioptas method: 0.999942383612
-	Gaussian method: 0.0569379824548
+	Achlioptas method: 0.111565798324
+	Gaussian method: 0.101800192209
 Probability of such greatest distortions (or larger): (delta, according to J-L lemma)
-    Achlioptas method: 0.0
-    Gaussian method: 143.00360919831965
+	Achlioptas method: 204.05879230061478
+	Gaussian method: 846.2758209939957
