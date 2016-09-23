@@ -95,13 +95,13 @@ def project(projection_matrix, original_samples_matrix):
     assert projection_matrix.shape[1] == original_samples_matrix.shape[0]
     return np.dot(projection_matrix, original_samples_matrix)
 
-def project_sparse_csr(projection_matrix_csr, original_samples_matrix):
-    assert projection_matrix_csr.shape[1] == original_samples_matrix.shape[0]
-    return sparse.csr_matrix.dot(projection_matrix_csr, original_samples_matrix)
+def project_sparse_csr(projection_matrix_csr, original_samples_matrix_csr):
+    assert projection_matrix_csr.shape[1] == original_samples_matrix_csr.shape[0]
+    return sparse.csr_matrix.dot(projection_matrix_csr, original_samples_matrix_csr)
 
-def project_sparse_dok(projection_matrix_dok, original_samples_matrix):
-    assert projection_matrix_dok.shape[1] == original_samples_matrix.shape[0]
-    return sparse.dok_matrix.dot(projection_matrix_dok, original_samples_matrix)
+def project_sparse_dok(projection_matrix_dok, original_samples_matrix_dok):
+    assert projection_matrix_dok.shape[1] == original_samples_matrix_dok.shape[0]
+    return sparse.dok_matrix.dot(projection_matrix_dok, original_samples_matrix_dok)
 
 def calculate_sample_distortion(original_vector, projected_vector):
     return abs(
@@ -135,6 +135,8 @@ def main():
     proj_dist_ach_time = 0.0
     proj_dist_gauss_time = 0.0
 
+    convert_bow_sparse_csr_time = 0.0
+    convert_bow_sparse_dok_time = 0.0
     convert_ach_sparse_csr_time = 0.0
     convert_ach_sparse_dok_time = 0.0
     proj_ach_sparse_csr_time = 0.0
@@ -151,6 +153,17 @@ def main():
     #             print("%i %i %i" % (i + 1, j + 1, doc[j]))
     # exit()
 
+    time_initial = timeit.default_timer()
+    docs_bag_of_words_sparse_csr = sparse.csr_matrix(docs_bag_of_words)
+    convert_bow_sparse_csr_time = timeit.default_timer() - time_initial
+
+    time_initial = timeit.default_timer()
+    docs_bag_of_words_sparse_dok = sparse.dok_matrix(docs_bag_of_words)
+    convert_bow_sparse_dok_time = timeit.default_timer() - time_initial
+    print("Time to convert the bag of words matrix to sparse representations:")
+    print("\tCompressed Sparse Row representation:", convert_bow_sparse_csr_time)
+    print("\tDictionary of Keys representation:", convert_bow_sparse_dok_time)
+
     # Passo 3.
     time_initial = timeit.default_timer()
     # sp.distance.pdist wants the vectors in the matrix' rows, thus we transpose.
@@ -159,7 +172,7 @@ def main():
     print("Time to calculate the original pairwise distances: ", orig_dist_time)
 
     # Passo 4.
-    proj_dims = [4**x for x in range(1, 9)]
+    proj_dims = [4**x for x in range(1, 8)]
     for n in proj_dims:
         print("-----------------------------------")
         print("Projecting in", n, "dimensions")
@@ -205,22 +218,22 @@ def main():
 
         # Sparse matrix try
         time_initial = timeit.default_timer()
-        proj_ach = project_sparse_csr(ach_mat_sparse_csr, docs_bag_of_words)
+        proj_ach_csr = project_sparse_csr(ach_mat_sparse_csr, docs_bag_of_words_sparse_csr)
         proj_ach_sparse_csr_time = timeit.default_timer() - time_initial
 
         time_initial = timeit.default_timer()
-        proj_ach = project_sparse_dok(ach_mat_sparse_dok, docs_bag_of_words)
+        proj_ach_dok = project_sparse_dok(ach_mat_sparse_dok, docs_bag_of_words_sparse_dok)
         proj_ach_sparse_dok_time = timeit.default_timer() - time_initial
 
         print("Projection times with sparse representations:")
         print("\tCompressed Sparse Row representation:", proj_ach_sparse_csr_time)
         print("\tDictionary of Keys representation:", proj_ach_sparse_dok_time)
 
-        print("(Convertion + Projection) times for each sparse representation:")
+        print("(Convertions + Projection) times for each sparse representation:")
         print("\tCompressed Sparse Row representation:",
-              convert_ach_sparse_csr_time + proj_ach_sparse_csr_time)
+              convert_bow_sparse_csr_time + convert_ach_sparse_csr_time + proj_ach_sparse_csr_time)
         print("\tDictionary of Keys representation:",
-              convert_ach_sparse_dok_time + proj_ach_sparse_dok_time)
+              convert_bow_sparse_dok_time + convert_ach_sparse_dok_time + proj_ach_sparse_dok_time)
 
         # 4.c.
         time_initial = timeit.default_timer()
