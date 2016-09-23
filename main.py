@@ -8,6 +8,8 @@ import timeit
 
 import numpy as np
 from scipy import spatial as sp
+from scipy import sparse
+
 
 # 1. Baixar o Dataset Bag of Words, arquivo NYTimes, do UCI. Não colocar no repositório.
 # 2. Crie bag of words para os primeiros 1.000 documentos, usando o vocabulário de 102.650 termos.
@@ -93,6 +95,13 @@ def project(projection_matrix, original_samples_matrix):
     assert projection_matrix.shape[1] == original_samples_matrix.shape[0]
     return np.dot(projection_matrix, original_samples_matrix)
 
+def project_sparse_csr(projection_matrix_csr, original_samples_matrix):
+    assert projection_matrix_csr.shape[1] == original_samples_matrix.shape[0]
+    return sparse.csr_matrix.dot(projection_matrix_csr, original_samples_matrix)
+
+def project_sparse_dok(projection_matrix_dok, original_samples_matrix):
+    assert projection_matrix_dok.shape[1] == original_samples_matrix.shape[0]
+    return sparse.dok_matrix.dot(projection_matrix_dok, original_samples_matrix)
 
 def calculate_sample_distortion(original_vector, projected_vector):
     return abs(
@@ -126,6 +135,11 @@ def main():
     proj_dist_ach_time = 0.0
     proj_dist_gauss_time = 0.0
 
+    convert_ach_sparse_csr_time = 0.0
+    convert_ach_sparse_dok_time = 0.0
+    proj_ach_sparse_csr_time = 0.0
+    proj_ach_sparse_dok_time = 0.0
+
     # Passo 2.
     docs_bag_of_words = get_docs_bag_of_words(filepath=filepath_docs_bag_of_words,
                                               num_docs=N,
@@ -145,7 +159,7 @@ def main():
     print("Time to calculate the original pairwise distances: ", orig_dist_time)
 
     # Passo 4.
-    proj_dims = [4**x for x in range(1, 9)]#[4**7]
+    proj_dims = [4**x for x in range(1, 9)]
     for n in proj_dims:
         print("-----------------------------------")
         print("Projecting in", n, "dimensions")
@@ -163,6 +177,19 @@ def main():
         print("\tAchlioptas method:", gen_ach_time)
         print("\tGaussian method:", gen_gauss_time)
 
+        # Sparse matrix try
+        time_initial = timeit.default_timer()
+        ach_mat_sparse_csr = sparse.csr_matrix(ach_mat)
+        convert_ach_sparse_csr_time = timeit.default_timer() - time_initial
+
+        time_initial = timeit.default_timer()
+        ach_mat_sparse_dok = sparse.dok_matrix(ach_mat)
+        convert_ach_sparse_dok_time = timeit.default_timer() - time_initial
+
+        print("Time to convert the Achlioptas projection matrix to sparse representations:")
+        print("\tCompressed Sparse Row representation:", convert_ach_sparse_csr_time)
+        print("\tDictionary of Keys representation:", convert_ach_sparse_dok_time)
+
         # 4.b.
         time_initial = timeit.default_timer()
         proj_ach = project(ach_mat, docs_bag_of_words)
@@ -175,6 +202,23 @@ def main():
         print("Projection times:")
         print("\tAchlioptas method:", proj_ach_time)
         print("\tGaussian method:", proj_gauss_time)
+
+        # Sparse matrix try
+        time_initial = timeit.default_timer()
+        proj_ach = project_sparse_csr(ach_mat_sparse_csr, docs_bag_of_words)
+        proj_ach_sparse_csr_time = timeit.default_timer() - time_initial
+
+        time_initial = timeit.default_timer()
+        proj_ach = project_sparse_dok(ach_mat_sparse_dok, docs_bag_of_words)
+        proj_ach_sparse_dok_time = timeit.default_timer() - time_initial
+
+        print("Projection times with sparse representations:")
+        print("\tCompressed Sparse Row representation:", proj_ach_sparse_csr_time)
+        print("\tDictionary of Keys representation:", proj_ach_sparse_dok_time)
+
+        print("(Convertion + Projection) times for each sparse representation:")
+        print("\tAchlioptas method:", convert_ach_sparse_csr_time + proj_ach_sparse_csr_time)
+        print("\tGaussian method:", convert_ach_sparse_dok_time + proj_ach_sparse_dok_time)
 
         # 4.c.
         time_initial = timeit.default_timer()
