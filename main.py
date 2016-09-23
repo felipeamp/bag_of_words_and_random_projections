@@ -159,7 +159,7 @@ def main():
     print("Time to calculate the original pairwise distances: ", orig_dist_time)
 
     # Passo 4.
-    proj_dims = [4**x for x in range(1, 9)]
+    proj_dims = [4**x for x in range(1, 7)]
     for n in proj_dims:
         print("-----------------------------------")
         print("Projecting in", n, "dimensions")
@@ -217,8 +217,10 @@ def main():
         print("\tDictionary of Keys representation:", proj_ach_sparse_dok_time)
 
         print("(Convertion + Projection) times for each sparse representation:")
-        print("\tAchlioptas method:", convert_ach_sparse_csr_time + proj_ach_sparse_csr_time)
-        print("\tGaussian method:", convert_ach_sparse_dok_time + proj_ach_sparse_dok_time)
+        print("\tCompressed Sparse Row representation:",
+              convert_ach_sparse_csr_time + proj_ach_sparse_csr_time)
+        print("\tDictionary of Keys representation:",
+              convert_ach_sparse_dok_time + proj_ach_sparse_dok_time)
 
         # 4.c.
         time_initial = timeit.default_timer()
