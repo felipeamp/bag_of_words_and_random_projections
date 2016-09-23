@@ -71,7 +71,7 @@ def gen_achlioptas_matrix(projected_sample_dimension, original_sample_dimension)
     assert original_sample_dimension > 0
     assert projected_sample_dimension < original_sample_dimension
 
-    scaling = math.sqrt(3.) / float(projected_sample_dimension)
+    scaling = math.sqrt(3. / float(projected_sample_dimension))
     options = (-scaling, 0., scaling)
     prob_weights = (1./6., 2./3., 1./6.)
     ach_mat = np.random.choice(options,
@@ -159,7 +159,7 @@ def main():
     print("Time to calculate the original pairwise distances: ", orig_dist_time)
 
     # Passo 4.
-    proj_dims = [4**x for x in range(1, 7)]
+    proj_dims = [4**x for x in range(1, 9)]
     for n in proj_dims:
         print("-----------------------------------")
         print("Projecting in", n, "dimensions")
