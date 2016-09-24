@@ -16,21 +16,34 @@ row.names <- c("gen_proj_mat_ach",
                "p_distortion_ach",
                "p_distortion_gauss")
 
+key.names <- read.csv("keynames.csv", header = FALSE)
+
 rownames(perf.data) <- row.names
 
 last.power <- 8
-y.up <- max(perf.data[c(1, 2, 5, 6, 11, 12), 1:6], na.rm = T)
+
+## Plots of the projection times
+times.idx <- c(1, 2, 5, 6, 11, 12)
+y.up <- max(perf.data[times.idx, 1:6], na.rm = T)
+png("projection-times.png", width = 800, height = 800)
+
 plot(x = 0,
      y = 0,
      type = 'n',
      xlim = c(0, last.power),
      ylim = c(0, y.up),
      xlab = "log_4(n)",
-     ylab = "Time(s)")
+     ylab = "Time(s)",
+     main = "Projection times using Achlioptas and Gaussian methods")
 
-idx.lines <- c(1, 2, 5, 6)
-
-for (i in idx.lines) {
+for (i in times.idx) {
     lines(x = 1:6, y = perf.data[i, 1:6], col = i)
     points(x = 1:6, y = perf.data[i, 1:6], col = i, pch = i)
 }
+
+legend(x = "topleft",
+       legend = key.names$V1[times.idx],
+       col = times.idx,
+       pch = times.idx)
+
+dev.off()
