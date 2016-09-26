@@ -10,8 +10,6 @@ Projection times:
 Time to calculate the pairwise distances:
     Achlioptas method: 0.002478660000633681
     Gaussian method: 0.002419333999569062
-main.py:120: RuntimeWarning: invalid value encountered in double_scalars
-  (np.dot(projected_vector, projected_vector) / np.dot(original_vector, original_vector)) - 1)
 Greatest distortions:
     Achlioptas method: 6.58484759672
     Gaussian method: 6.6558066454
@@ -102,8 +100,6 @@ Projection times:
 Time to calculate the pairwise distances:
     Achlioptas method: 7.219305100999918
     Gaussian method: 4.278863520998129
-main.py:120: RuntimeWarning: invalid value encountered in double_scalars
-  (np.dot(projected_vector, projected_vector) / np.dot(original_vector, original_vector)) - 1)
 Greatest distortions:
     Achlioptas method: 0.0465862391104
     Gaussian method: 0.0535834179464
