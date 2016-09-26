@@ -8,20 +8,13 @@ last.power <- 8
 perf.data <- read.csv("output_clean.csv")
 row.names <- c("gen_proj_mat_ach",
                "gen_proj_mat_gauss",
-               "sparse_UNK0",
-               "sparse_UNK1",
                "proj_ach",
                "proj_gauss",
-               "sparse_UNK2",
-               "sparse_UNK3",
-               "sparse_UNK4",
-               "sparse_UNK5",
                "proj_pdist_ach",
                "proj_pdist_gauss",
                "distortion_ach",
                "distortion_gauss",
-               "p_distortion_ach",
-               "p_distortion_gauss")
+               "p_99_error")
 
 rownames(perf.data) <- row.names
 
@@ -29,14 +22,13 @@ key.names <- read.csv("keynames.csv", header = FALSE)
 pdist.times <- read.csv("pdist-times.csv")
 
 ## Plots of the projection times
-times.idx <- c(1, 2, 5, 6, 11, 12)
+times.idx <- 1:6
 times.xval <- numeric(length = last.power)
 
 for (i in 1:last.power)
     times.xval[i] <- 4 ** i
 
 y.up <- max(perf.data[times.idx, 1:7], na.rm = T)
-
 
 old.wd <- getwd()
 dir.create(plot.path, showWarnings = FALSE, recursive = TRUE)
@@ -68,7 +60,7 @@ legend(x = "topleft",
 dev.off()
 
 ## Plots of the maximum distortions
-max.dist.idx <- c(13, 14)
+max.dist.idx <- 7:9
 y.up <- max(perf.data[max.dist.idx, 1:7], na.rm = T)
 
 png("maximum-distortions_log-scale.png", width = 800, height = 800)
@@ -91,8 +83,8 @@ for (i in 1:length(max.dist.idx)) {
 
 legend(x = "topright",
        legend = key.names$V1[max.dist.idx],
-       col = 1:2,
-       pch = 1:2)
+       col = 1:3,
+       pch = 1:3)
 
 dev.off()
 
@@ -129,12 +121,12 @@ dev.off()
 ## pairwise distance times.
 mean.time <- mean(t(pdist.times))
 
-ach.times.idx <- c(1, 5, 11)
-gauss.times.idx <- c(2, 6, 12)
+ach.times.idx <- c(1, 3, 5)
+gauss.times.idx <- c(2, 4, 6)
 
 ach.total.times <- colSums(perf.data[ach.times.idx, 1:7])
 gauss.total.times <- colSums(perf.data[gauss.times.idx, 1:7])
-total.dist.times <- rbind(rep(mean.time, times = 7), ach.total.times, gauss.total.times)
+total.dist.times <- rbind(ach.total.times, gauss.total.times)
 
 y.up <- max(rbind(ach.total.times, gauss.total.times), mean.time)
 
@@ -152,9 +144,14 @@ plot(x = 0,
 minor.tick(nx = 2, ny = 10)
 
 for (i in 1:nrow(total.dist.times)) {
-    lines(x = 1:7, y = total.dist.times[i, ], col = i)
-    points(x = 1:7, y = total.dist.times[i, ], col = i, pch = i)
+    lines(x = 1:7, y = total.dist.times[i, ], col = i+1)
+    points(x = 1:7, y = total.dist.times[i, ], col = i+1, pch = i+1)
 }
+
+abline(h = mean.time)
+points(rep(mean.time, times = 7))
+
+text(x = 8, y = 35, labels = sprintf("%.4f", mean.time), col = 1)
 
 legend(x = "topleft",
        legend = c("Original Pairwise Distances", "Pairwise Distances (ACH)", "Pairwise Distances (GAUSS)"),
