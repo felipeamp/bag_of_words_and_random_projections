@@ -5,7 +5,7 @@ plot.path <- "images/"
 last.power <- 8
 
 ## Reading the data from the CSV files.
-perf.data <- read.csv("output_clean.csv")
+perf.data <- read.csv("output_full.csv", header = F)
 row.names <- c("gen_proj_mat_ach",
                "gen_proj_mat_gauss",
                "proj_ach",
@@ -16,25 +16,24 @@ row.names <- c("gen_proj_mat_ach",
                "distortion_gauss",
                "p_99_error")
 
+exponents <- 1:last.power
+col.names <- sprintf("%s", 4 ** exponents)
+
 rownames(perf.data) <- row.names
+colnames(perf.data) <- col.names
 
 key.names <- read.csv("keynames.csv", header = FALSE)
-pdist.times <- read.csv("pdist-times.csv")
 
 ## Plots of the projection times
-times.idx <- 1:6
-times.xval <- numeric(length = last.power)
+times.idx <- 1:last.power
 
-for (i in 1:last.power)
-    times.xval[i] <- 4 ** i
-
-y.up <- max(perf.data[times.idx, 1:7], na.rm = T)
+y.up <- max(perf.data[times.idx, 1:length(times.idx)], na.rm = T)
 
 old.wd <- getwd()
 dir.create(plot.path, showWarnings = FALSE, recursive = TRUE)
 setwd(plot.path)
 
-png("projection-times_log-scale.png", width = 800, height = 800)
+pdf("projection-times_log-scale.pdf", width = 8, height = 8)
 
 plot(x = 0,
      y = 0,
@@ -48,8 +47,8 @@ plot(x = 0,
 minor.tick(nx = 2, ny = 10)
 
 for (i in times.idx) {
-    lines(x = 1:7, y = perf.data[i, 1:7], col = i)
-    points(x = 1:7, y = perf.data[i, 1:7], col = i, pch = i)
+    lines(x = times.idx, y = perf.data[i, times.idx], col = i)
+    points(x = times.idx, y = perf.data[i, times.idx], col = i, pch = i)
 }
 
 legend(x = "topleft",
@@ -61,9 +60,9 @@ dev.off()
 
 ## Plots of the maximum distortions
 max.dist.idx <- 7:9
-y.up <- max(perf.data[max.dist.idx, 1:7], na.rm = T)
+y.up <- max(perf.data[max.dist.idx, times.idx], na.rm = T)
 
-png("maximum-distortions_log-scale.png", width = 800, height = 800)
+pdf("maximum-distortions_log-scale.pdf", width = 8, height = 8)
 
 plot(x = 0,
      y = 0,
@@ -77,8 +76,8 @@ plot(x = 0,
 minor.tick(nx = 2, ny = 1)
 
 for (i in 1:length(max.dist.idx)) {
-    lines(x = 1:7, y = perf.data[max.dist.idx[i], 1:7], col = i)
-    points(x = 1:7, y = perf.data[max.dist.idx[i], 1:7], col = i, pch = i)
+    lines(x = 1:8, y = perf.data[max.dist.idx[i], 1:8], col = i)
+    points(x = 1:8, y = perf.data[max.dist.idx[i], 1:8], col = i, pch = i)
 }
 
 legend(x = "topright",
@@ -88,49 +87,20 @@ legend(x = "topright",
 
 dev.off()
 
-## Plots of the probability of such distortions
-prob.dist.idx <- c(15, 16)
-y.up <- max(perf.data[prob.dist.idx, 1:7], na.rm = T)
-
-png("prob-maximum-distortions_log-scale.png", width = 800, height = 800)
-
-plot(x = 0,
-     y = 0,
-     type = 'n',
-     xlim = c(0, last.power),
-     ylim = c(0, y.up),
-     xlab = "Dimension (log_4(n))",
-     ylab = "Probability of Maximum Distortion",
-     main = "Probability of maximum distortions using Achlioptas and Gaussian methods")
-
-minor.tick(nx = 2, ny = 10)
-
-for (i in 1:length(prob.dist.idx)) {
-    lines(x = 1:7, y = perf.data[prob.dist.idx[i], 1:7], col = i)
-    points(x = 1:7, y = perf.data[prob.dist.idx[i], 1:7], col = i, pch = i)
-}
-
-legend(x = "topleft",
-       legend = key.names$V1[prob.dist.idx],
-       col = 1:2,
-       pch = 1:2)
-
-dev.off()
-
 ## Plots of the original pairwise distance times compared to the projected
 ## pairwise distance times.
-mean.time <- mean(t(pdist.times))
+mean.time <- 42.5662
 
 ach.times.idx <- c(1, 3, 5)
 gauss.times.idx <- c(2, 4, 6)
 
-ach.total.times <- colSums(perf.data[ach.times.idx, 1:7])
-gauss.total.times <- colSums(perf.data[gauss.times.idx, 1:7])
+ach.total.times <- colSums(perf.data[ach.times.idx, times.idx])
+gauss.total.times <- colSums(perf.data[gauss.times.idx,times.idx])
 total.dist.times <- rbind(ach.total.times, gauss.total.times)
 
 y.up <- max(rbind(ach.total.times, gauss.total.times), mean.time)
 
-png("proj-times-comparison.png", width = 800, height = 800)
+pdf("proj-times-comparison.pdf", width = 8, height = 8)
 
 plot(x = 0,
      y = 0,
@@ -144,14 +114,14 @@ plot(x = 0,
 minor.tick(nx = 2, ny = 10)
 
 for (i in 1:nrow(total.dist.times)) {
-    lines(x = 1:7, y = total.dist.times[i, ], col = i+1)
-    points(x = 1:7, y = total.dist.times[i, ], col = i+1, pch = i+1)
+    lines(x = 1:8, y = total.dist.times[i, ], col = i+1)
+    points(x = 1:8, y = total.dist.times[i, ], col = i+1, pch = i+1)
 }
 
 abline(h = mean.time)
 points(rep(mean.time, times = 7))
 
-text(x = 8, y = 35, labels = sprintf("%.4f", mean.time), col = 1)
+text(x = 8, y = 50, labels = sprintf("%.4f", mean.time), col = 1)
 
 legend(x = "topleft",
        legend = c("Original Pairwise Distances", "Pairwise Distances (ACH)", "Pairwise Distances (GAUSS)"),
@@ -161,3 +131,9 @@ legend(x = "topleft",
 dev.off()
 
 setwd(old.wd)
+
+## Generating the tables.
+## Generating a table with the times.
+xtable(perf.data[1:6, ])
+## Generating a table with the maximum distortions and the probability of such distortions.
+xtable(perf.data[max.dist.idx, ])

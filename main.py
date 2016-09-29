@@ -119,34 +119,18 @@ def main():
     docs_bag_of_words = get_docs_bag_of_words(filepath=filepath_docs_bag_of_words,
                                               num_docs=N,
                                               num_words_in_vocabulary=d)
-    # Debug
-    # for i, doc in enumerate(docs_bag_of_words.T):
-    #     for j in range(d):
-    #         if doc[j] != 0:
-    #             print("%i %i %i" % (i + 1, j + 1, doc[j]))
-    # exit()
-
-    # time_initial = timeit.default_timer()
-    # docs_bag_of_words_sparse_csr = sparse.csr_matrix(docs_bag_of_words)
-    # convert_bow_sparse_csr_time = timeit.default_timer() - time_initial
-
-    # time_initial = timeit.default_timer()
-    # docs_bag_of_words_sparse_dok = sparse.dok_matrix(docs_bag_of_words)
-    # convert_bow_sparse_dok_time = timeit.default_timer() - time_initial
-    # print("Time to convert the bag of words matrix to sparse representations:")
-    # print("\tCompressed Sparse Row representation:", convert_bow_sparse_csr_time)
-    # print("\tDictionary of Keys representation:", convert_bow_sparse_dok_time)
 
     # Passo 3.
     time_initial = timeit.default_timer()
-    # sp.distance.pdist wants the vectors in the matrix' rows, thus we transpose.
     original_distances = sp.distance.pdist(docs_bag_of_words.T, metric='euclidean')
     orig_dist_time = timeit.default_timer() - time_initial
     print("Time to calculate the original pairwise distances: ", orig_dist_time)
 
     # Passo 4.
-    proj_dims = [4**x for x in range(1, 8)]
-    for n in proj_dims:
+    proj_dims = [(4**x, x - 1) for x in range(1, 9)]
+    benchmark_matrix = np.zeros((9, len(proj_dims)))
+
+    for n, col in proj_dims:
         print("-----------------------------------")
         print("Projecting in", n, "dimensions")
 
@@ -241,6 +225,17 @@ def main():
         print("Probability of distortions\' 99% percentile (according to J-L lemma): {}".format(
             prob_99_perc_distortion))
 
+        benchmark_matrix[:, col] = [gen_ach_time,
+                                    gen_gauss_time,
+                                    proj_ach_time,
+                                    proj_gauss_time,
+                                    proj_dist_ach_time,
+                                    proj_dist_gauss_time,
+                                    ach_max_distortion,
+                                    gauss_max_distortion,
+                                    prob_99_perc_distortion]
+
+    print(benchmark_matrix)
 
 if __name__ == '__main__':
     main()
